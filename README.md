@@ -7,4 +7,4 @@ This repository contains a small Python scipt I wrote to prepare my huge local m
 
 At the end of the script, the files are stored in an output folder, ready to be copyied to the phone.
 
-Note: This is a tool built for my specific personal needs. It will likely need significant adaptation to fit other setups. I guess it demonstrates calling ffmpeg efficiently from Python in parallel. If that is useful to you, take a peak!
+Note: This is a tool built for my specific personal needs. It will likely need significant adaptation to fit other setups. I guess it demonstrates calling a subprocess from Python in parallel, and 2 pass loudness normalization with FFMPEG. If that is useful to you, take a peak!
