@@ -121,26 +121,25 @@ def _get_playlists(library, destination):
 	known_files = list(list_files(library, known=True))
 
 	for file in known_files:
-		file_path = library / file
-
 		# Those all have at least 'Known' in comment tag
-		tags = TinyTag.get(str(file_path))
+		tags = TinyTag.get(str(library / file))
+		file_path = (library / file).relative_to(library)
 
 		# Everything
-		playlists['Everything'].append(file)
+		playlists['Everything'].append(file_path)
 
 		# Work
 		if 'Kid' not in tags.comment:
-			playlists['Work'].append(file)
+			playlists['Work'].append(file_path)
 
 		# Russian
 		if 'Russian' in tags.comment:
-			playlists['Russian'].append(file)
+			playlists['Russian'].append(file_path)
 
 		# Latest50
-		mod_date = file_path.stat().st_ctime
+		mod_date = (library / file).stat().st_ctime
 		if len(playlists['Latest50']) < 50 or mod_date > playlists['Latest50'][-1][1]:
-			playlists['Latest50'].append((file, mod_date))
+			playlists['Latest50'].append((file_path, mod_date))
 			playlists['Latest50'] = sorted(playlists['Latest50'], key=lambda x: x[1], reverse=True)[:50]
 
 	playlists['Latest50'] = [x[0] for x in playlists['Latest50']]
@@ -153,7 +152,7 @@ def make_playlists(library, destination):
 
 	# For computer and phone
 	for path in [library, destination]:
-		playlists_path =path / 'Playlists'
+		playlists_path = path / 'Playlists'
 
 		# Create destination arborescence if necessary
 		playlists_path.mkdir(parents=True, exist_ok=True)
@@ -162,12 +161,13 @@ def make_playlists(library, destination):
 		for playlist_name in playlists.keys():
 			playlist_path = playlists_path / (playlist_name + '.m3u')
 
-			with open(playlist_path, 'w') as f:
+			with open(playlist_path, 'w', encoding='utf-8') as f:
 
 				# For each music file path
 				for file in playlists[playlist_name]:
-					file_path = '../Library/' + Path(file).stem + '.m4a'
-					f.write(file_path + '\n')
+					suffix = '.mp3' if path == destination else file.suffix
+					file_path = '..' / file.with_suffix(suffix)
+					f.write(str(file_path) + '\n')
 
 # Transcode and Loudnorm a single music file
 # TODO: Use opus if/when cover art integration is correctly handled in ffmpeg
